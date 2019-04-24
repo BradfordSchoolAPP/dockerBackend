@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+  bradford-backend:
+    build:
+      context: ./bradford-backend
+    environment:
+      - POSTGRESQL_HOST=bradford-database
+      - POSTGRESQL_USER=postgres
+      - POSTGRESQL_PASS=postgres
+      - POSTGRESQL_PORT=5432
+      - MONGO_HOST=bradford-docs-database
+      - MONGO_PORT=27017
+    depends_on:
+      - bradford-database
+  
+  load-balancer:
+    build:
+      context: ./load-balancer
+    ports:
+      - 3000:80
+    depends_on:
+      - bradford-backend
+
+  bradford-database:
+    image: postgres:11.2-alpine
+    volumes: 
+      - db-data:/home/noteip110/data/postgres
+  
+  bradford-docs-database:
+    image: mvertes/alpine-mongo
+    volumes:
+      - docs-data:/home/noteip110/data/mongodb
+    
+volumes:
+  db-data:
+  docs-data:
